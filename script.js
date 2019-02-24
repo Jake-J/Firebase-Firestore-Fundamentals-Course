@@ -1,5 +1,30 @@
 $(document ).ready(function() {
-    //get all the data on app startup
+    //get all the data on app startup\
+
+    LoadData();
+    function LoadData() {
+        employeesRef.get().then(querySnapshot => LoadTableData(querySnapshot));
+    }
+
+    function LoadTableData(querySnapshot) {
+        var tableRow = '';
+        querySnapshot.forEach(doc => {
+            var document = doc.data();
+            tableRow += `<tr><td class="fname">${document.fName}</td>
+                            <td class="lname">${document.lName}</td>
+                            <td class="email">${document.email}</td>
+                            <td class="age">${document.age}</td>
+                            <td class="gender">${document.gender}</td>
+                            <td class="yearsofexperience">${document.yearsOfExperience}</td>
+                            <td class="isFullTime">${document.isFullTime}</td>
+                            <td class="editEmployee">${document.isFullTime}</td>
+                            <td class="editEmployee"><i class="fa fa-pencil" aria-hidden="true" style="color:green"></i></td>
+                            <td class="deleteEmployee"><i class="fa fa-trash" aria-hidden="true" style="color:red"></i></td>
+                        </tr>`
+        });
+        $('tbody.tbodyData').html(tableRow);
+    }
+
     $('#createEmployee').click(function(){
         $('.employeeForm').css("display", "block");
         $('#dynamicBtn').text('Save Changes')
@@ -7,18 +32,63 @@ $(document ).ready(function() {
 
     $('#dynamicBtn').click(function(){
         //employee form values
-        var fname = $("#fname").val();
-        var lname = $("#lname").val();
+        var fName = $("#fname").val();
+        var lName = $("#lname").val();
         var email = $("#email").val();
         var age = $("#age").val();
         var gender = $("#gender").val();
         var yearsOfExperience = $("#yearsOfExperience").val();
-        var isfulltime = $('#isFullTime').is(":checked")
+        var isFullTime = $('#isFullTime').is(":checked")
 
         //check if you need to create or update an employee
         if($(this).text() == "Save Changes"){
+            var docuName = `${fName.charAt(0)}.${lName}`;
+            console.log(docuName);
+            db.collection("employees").doc(docuName).set({
+                fName,
+                lName,
+                email,
+                age,
+                gender,
+                yearsOfExperience,
+                isFullTime,
+            }).then( docRef => {
+                $('#operationStatus')
+                    .html('<div class="alert alert-success"><strong>Success!</strong>Employee was created!</div>')
+                    .delay(2500)
+                    .fadeOut('slow');
+                $('.employeeForm').css("display","none");
+                LoadData();
+            }).catch(err => {
+                $('#operationStatus')
+                    .html('<div class="alert alert-danger"><strong>Error!</strong>Employee was not created!</div>')
+            })
         }
         else{
+            var docuName = `${fName.charAt(0)}.${lName}`;
+            var sfDocRef = db.collection("employees").doc(docuName);
+            sfDocRef.set({
+                fName,
+                lName,
+                email,
+                age,
+                gender,
+                yearsOfExperience,
+                isFullTime,
+            },
+            {
+                merge: true,
+            }).then( docRef => {
+                $('#operationStatus')
+                    .html('<div class="alert alert-success"><strong>Success!</strong>Employee was updated!</div>')
+                    .delay(2500)
+                    .fadeOut('slow');
+                $('.employeeForm').css("display","none");
+                LoadData();
+            }).catch(err => {
+                $('#operationStatus')
+                    .html('<div class="alert alert-danger"><strong>Error!</strong>Employee was not updated!</div>')
+            })
         }
     });
 
@@ -46,6 +116,19 @@ $(document ).ready(function() {
         //Get the Employee Data
         var fName = $(this).closest('tr').find('.fname').text(); //First Name
         var lName = $(this).closest('tr').find('.lname').text(); //Last Name
+
+        var docuName = `${fName.charAt(0)}.${lName}`;
+        db.collection("employees").doc(docuName).delete().then( docRef => {
+            $('#operationStatus')
+                .html('<div class="alert alert-success"><strong>Success!</strong>Employee was deleted!</div>')
+                .delay(2500)
+                .fadeOut('slow');
+            $('.employeeForm').css("display","none");
+            LoadData();
+        }).catch(err => {
+            $('#operationStatus')
+                .html('<div class="alert alert-danger"><strong>Error!</strong>Employee was not deleted!</div>')
+        })
     });
 
     $("#searchEmployee" ).change(function() {
