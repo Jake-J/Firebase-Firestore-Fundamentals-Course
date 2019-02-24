@@ -1,29 +1,7 @@
 $(document ).ready(function() {
     //get all the data on app startup\
 
-    LoadData();
-    function LoadData() {
-        employeesRef.get().then(querySnapshot => LoadTableData(querySnapshot));
-    }
 
-    function LoadTableData(querySnapshot) {
-        var tableRow = '';
-        querySnapshot.forEach(doc => {
-            var document = doc.data();
-            tableRow += `<tr><td class="fname">${document.fName}</td>
-                            <td class="lname">${document.lName}</td>
-                            <td class="email">${document.email}</td>
-                            <td class="age">${document.age}</td>
-                            <td class="gender">${document.gender}</td>
-                            <td class="yearsofexperience">${document.yearsOfExperience}</td>
-                            <td class="isFullTime">${document.isFullTime}</td>
-                            <td class="editEmployee">${document.isFullTime}</td>
-                            <td class="editEmployee"><i class="fa fa-pencil" aria-hidden="true" style="color:green"></i></td>
-                            <td class="deleteEmployee"><i class="fa fa-trash" aria-hidden="true" style="color:red"></i></td>
-                        </tr>`
-        });
-        $('tbody.tbodyData').html(tableRow);
-    }
 
     $('#createEmployee').click(function(){
         $('.employeeForm').css("display", "block");
@@ -58,7 +36,7 @@ $(document ).ready(function() {
                     .delay(2500)
                     .fadeOut('slow');
                 $('.employeeForm').css("display","none");
-                LoadData();
+                // LoadData();
             }).catch(err => {
                 $('#operationStatus')
                     .html('<div class="alert alert-danger"><strong>Error!</strong>Employee was not created!</div>')
@@ -84,7 +62,7 @@ $(document ).ready(function() {
                     .delay(2500)
                     .fadeOut('slow');
                 $('.employeeForm').css("display","none");
-                LoadData();
+                // LoadData();
             }).catch(err => {
                 $('#operationStatus')
                     .html('<div class="alert alert-danger"><strong>Error!</strong>Employee was not updated!</div>')
@@ -124,7 +102,7 @@ $(document ).ready(function() {
                 .delay(2500)
                 .fadeOut('slow');
             $('.employeeForm').css("display","none");
-            LoadData();
+            // LoadData();
         }).catch(err => {
             $('#operationStatus')
                 .html('<div class="alert alert-danger"><strong>Error!</strong>Employee was not deleted!</div>')
